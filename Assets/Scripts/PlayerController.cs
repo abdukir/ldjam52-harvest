@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
+using UnityEngine.UIElements;
 
 public enum PlayerState
 {
@@ -44,6 +45,8 @@ public class PlayerController : MonoBehaviour
 
 	[SerializeField] private bool groundedEnter;
 	[SerializeField] private Transform head;
+
+	[SerializeField] private Transform QTAIconHolder;
 
 	public PlayerState curState;
 	void Start()
