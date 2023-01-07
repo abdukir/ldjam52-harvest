@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
-using UnityEngine.UIElements;
 
 public enum PlayerState
 {
@@ -47,6 +46,9 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private Transform head;
 
 	[SerializeField] private Transform QTAIconHolder;
+	[SerializeField] private GameObject QTAIconPrefab;
+
+	[SerializeField] private List<QTAIcon> QTAS = new List<QTAIcon>();
 
 	public PlayerState curState;
 	void Start()
@@ -188,7 +190,48 @@ public class PlayerController : MonoBehaviour
 	}
 	private void OnQTAKey(QTA _key)
 	{
+		if (QTAS.Count == 0)
+		{
+			//End event
+			curState = PlayerState.Gameplay;
+			return;
+		}
+
+		if (_key == QTAS[0].qtaType)
+		{
+			QTAS[0].gameObject.SetActive(false);
+			QTAS.RemoveAt(0);
+		}
+
 		Debug.Log(_key);
 	}
 
+
+	private void OnTriggerEnter2D(Collider2D collision)
+	{
+		switch (collision.tag)
+		{
+			case "Crop":
+				StartQTA(collision.GetComponent<Crop>());
+				break;
+		}
+	}
+
+	private void StartQTA(Crop _curCrop)
+	{
+		curState = PlayerState.QTA;
+		rb.velocity= Vector3.zero;
+		anim.SetBool("jumping", false);
+		anim.SetBool("walking", false);
+
+		for (int i = 0; i < _curCrop.QTAS.Count; i++)
+		{
+			//QTAS.Add(Instantiate(QTAIconPrefab, QTAIconHolder).GetComponent<QTAIcon>());
+			QTAS.Add(QTAIconHolder.GetChild(i).GetComponent<QTAIcon>());
+			QTAS[i].gameObject.SetActive(true);
+			QTAS[i].qtaType = _curCrop.QTAS[i];
+			QTAS[i].UpdateIcon();
+		}
+		QTAIconHolder.gameObject.SetActive(true);
+	}
 }

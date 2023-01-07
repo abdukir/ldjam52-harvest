@@ -18,6 +18,7 @@ public class QTAIcon : MonoBehaviour
     [ContextMenu("UpdateIcon")]
     public void UpdateIcon()
     {
+		icon = GetComponent<Image>();
 		icon.sprite = icons[(int)qtaType];
 	}
 }
