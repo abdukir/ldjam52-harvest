@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using CameraShake;
 using DG.Tweening;
 
 public enum PlayerState
