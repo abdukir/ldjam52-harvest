@@ -50,6 +50,9 @@ public class PlayerController : MonoBehaviour
 	[SerializeField] private GameObject QTAIconPrefab;
 
 	[SerializeField] private List<QTAIcon> QTAS = new List<QTAIcon>();
+	public Crop curCrop;
+
+	public float posStr, rotStr, freq, numB;
 
 	public PlayerState curState;
 	void Start()
@@ -74,7 +77,6 @@ public class PlayerController : MonoBehaviour
 			case PlayerState.Hold:
 				break;
 		}
-
 		
 	}
 
@@ -191,12 +193,7 @@ public class PlayerController : MonoBehaviour
 	}
 	private void OnQTAKey(QTA _key)
 	{
-		if (QTAS.Count == 0)
-		{
-			//End event
-			curState = PlayerState.Gameplay;
-			return;
-		}
+		CameraShaker.Presets.ShortShake2D(posStr, rotStr, freq, (int)numB);
 
 		if (_key == QTAS[0].qtaType)
 		{
@@ -204,6 +201,12 @@ public class PlayerController : MonoBehaviour
 			QTAS.RemoveAt(0);
 		}
 
+		if (QTAS.Count == 0)
+		{
+			//End event
+			curState = PlayerState.Gameplay;
+			return;
+		}
 		Debug.Log(_key);
 	}
 
@@ -213,24 +216,25 @@ public class PlayerController : MonoBehaviour
 		switch (collision.tag)
 		{
 			case "Crop":
-				StartQTA(collision.GetComponent<Crop>());
+				curCrop = collision.GetComponent<Crop>();
+				StartQTA();
 				break;
 		}
 	}
 
-	private void StartQTA(Crop _curCrop)
+	private void StartQTA()
 	{
 		curState = PlayerState.QTA;
 		rb.velocity= Vector3.zero;
 		anim.SetBool("jumping", false);
 		anim.SetBool("walking", false);
 
-		for (int i = 0; i < _curCrop.QTAS.Count; i++)
+		for (int i = 0; i < curCrop.QTAS.Count; i++)
 		{
 			//QTAS.Add(Instantiate(QTAIconPrefab, QTAIconHolder).GetComponent<QTAIcon>());
 			QTAS.Add(QTAIconHolder.GetChild(i).GetComponent<QTAIcon>());
 			QTAS[i].gameObject.SetActive(true);
-			QTAS[i].qtaType = _curCrop.QTAS[i];
+			QTAS[i].qtaType = curCrop.QTAS[i];
 			QTAS[i].UpdateIcon();
 		}
 		QTAIconHolder.gameObject.SetActive(true);
