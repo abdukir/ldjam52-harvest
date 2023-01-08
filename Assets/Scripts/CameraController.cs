@@ -40,7 +40,7 @@ public class CameraController : MonoBehaviour
 	private void GameplayUpdate()
 	{
 		transform.position = Vector3.Lerp(transform.position, new Vector3(target.position.x / camFollowDiv.x, target.position.y / camFollowDiv.y, transform.position.z), Time.deltaTime * moveSpeed);
-		cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, 5.21f, Time.deltaTime * moveSpeed);
+		cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, 7.3f, Time.deltaTime * moveSpeed);
 	}
 
 	public Vector3 GetCenterPoint(Transform _target1,Transform _target2)

@@ -217,4 +217,16 @@ public static class Extensions
         _curVector.z = _newZ;
         return _curVector;
     }
+
+	/// <summary>
+	/// Fastly change Z of a Vector3
+	/// </summary>
+	/// <param name="_curVector"></param>
+	/// <param name="_newZ"></param>
+	/// <returns></returns>
+	public static Vector2 ChangeY2D(this Vector2 _curVector, float _newZ)
+	{
+		_curVector.y = _newZ;
+		return _curVector;
+	}
 }

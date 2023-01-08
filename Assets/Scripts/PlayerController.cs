@@ -45,11 +45,17 @@ public class PlayerController : MonoBehaviour
 
 	[SerializeField] private bool groundedEnter;
 	[SerializeField] private Transform head;
+	[SerializeField] private Transform arm;
+
+	[SerializeField] private Transform leftBucket,rightBucket;
 
 	[SerializeField] private Transform QTAIconHolder;
 	[SerializeField] private GameObject QTAIconPrefab;
 
 	[SerializeField] private List<QTAIcon> QTAS = new List<QTAIcon>();
+
+	private QTA lastKey;
+
 	public Crop curCrop;
 
 	public float posStr, rotStr, freq, numB;
@@ -82,14 +88,15 @@ public class PlayerController : MonoBehaviour
 
 	private void UpdateQTA()
 	{
-		if (Input.GetKeyDown(KeyCode.LeftArrow))
+		if (Input.GetKeyDown(KeyCode.LeftArrow)|| Input.GetKeyDown(KeyCode.A))
 			OnQTAKey(QTA.leftArrow);
-		if (Input.GetKeyDown(KeyCode.DownArrow))
+		if (Input.GetKeyDown(KeyCode.DownArrow) || Input.GetKeyDown(KeyCode.S))
 			OnQTAKey(QTA.downArrow);
-		if (Input.GetKeyDown(KeyCode.RightArrow))
+		if (Input.GetKeyDown(KeyCode.RightArrow) || Input.GetKeyDown(KeyCode.D))
 			OnQTAKey(QTA.rightArrow);
-		if (Input.GetKeyDown(KeyCode.UpArrow))
+		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
 			OnQTAKey(QTA.upArrow);
+		rb.velocity.ChangeY2D(0);
 		/*if (Input.GetKeyDown(KeyCode.Space))
 			OnQTAKey(QTA.Space);*/
 	}
@@ -147,7 +154,7 @@ public class PlayerController : MonoBehaviour
 			anim.SetBool("jumping", true);
 		}
 
-		if (Input.GetKeyDown(KeyCode.UpArrow))
+		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
 		{
 			jumpBufferCounter = jumpBufferTime;
 		}
@@ -156,7 +163,7 @@ public class PlayerController : MonoBehaviour
 			jumpBufferCounter -= Time.deltaTime;
 		}
 
-		if (Input.GetKeyUp(KeyCode.UpArrow))
+		if (Input.GetKeyUp(KeyCode.UpArrow) || Input.GetKeyUp(KeyCode.W))
 		{
 			cayoteTimeCounter = 0f;
 		}
@@ -165,7 +172,7 @@ public class PlayerController : MonoBehaviour
 		{
 			rb.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
 		}
-		else if (rb.velocity.y > 0 && !Input.GetKey(KeyCode.UpArrow))
+		else if (rb.velocity.y > 0 && !(Input.GetKey(KeyCode.UpArrow) || Input.GetKey(KeyCode.W)))
 		{
 			rb.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
 		}
@@ -197,19 +204,79 @@ public class PlayerController : MonoBehaviour
 
 		if (_key == QTAS[0].qtaType)
 		{
+			// Correct qta
 			QTAS[0].gameObject.SetActive(false);
+			PullAnim(_key);
+			lastKey = _key;
 			QTAS.RemoveAt(0);
 		}
 
 		if (QTAS.Count == 0)
 		{
 			//End event
-			curState = PlayerState.Gameplay;
+			EndQTA();
+			EndQtaAnim();
 			return;
 		}
 		Debug.Log(_key);
 	}
 
+	private void EndQtaAnim()
+	{
+		Sequence endSeq = DOTween.Sequence();
+		switch (lastKey)
+		{
+			case QTA.leftArrow:
+				endSeq.Append(curCrop.transform.DOJump(leftBucket.position, 9, 1, 2f));
+				endSeq.Join(curCrop.transform.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
+				break;
+			case QTA.rightArrow:
+				endSeq.Join(curCrop.transform.DOJump(rightBucket.position, 9, 1, 2f));
+				endSeq.Join(curCrop.transform.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
+				break;
+			case QTA.upArrow:
+				endSeq.Append(curCrop.transform.DOJump((Random.value > 0.5f) ? leftBucket.position : rightBucket.position, 9, 1, 2f));
+				endSeq.Join(curCrop.transform.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
+				break;
+			case QTA.downArrow:
+				endSeq.Append(curCrop.transform.DOJump((Random.value > 0.5f) ? leftBucket.position : rightBucket.position, 9, 1, 2f));
+				endSeq.Join(curCrop.transform.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
+				break;
+		}
+
+	}
+
+	private void PullAnim(QTA _key)
+	{
+		curCrop.transform.GetChild(0).DOShakePosition(0.1f, 0.3f, 50, 90);
+		curCrop.transform.GetChild(0).DOShakeRotation(0.1f, 30, 50, 90);
+		switch (_key)
+		{
+			case QTA.leftArrow:
+				LeftRightAnim(curCrop.transform.GetChild(0), true);
+				break;
+			case QTA.rightArrow:
+				LeftRightAnim(curCrop.transform.GetChild(0), false);
+				break;
+			case QTA.upArrow:
+				break;
+			case QTA.downArrow:
+				break;
+			default:
+				break;
+		}
+	}
+
+	private void LeftRightAnim(Transform _crop, bool _isLeft)
+	{
+		float rotAmount = 10f;
+		if (_crop.eulerAngles.z < -15f || _crop.eulerAngles.z > 15f)
+		{
+			rotAmount = 0f;
+		}
+		_crop.DOLocalRotate(new Vector3(0, 0, _crop.transform.eulerAngles.z + (_isLeft ? rotAmount : -rotAmount)), 0.1f);
+		arm.DOLocalMoveX((_isLeft ? -0.3f : 0.2f), 0.1f);
+	}
 
 	private void OnTriggerEnter2D(Collider2D collision)
 	{
@@ -222,13 +289,36 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	private void OnTriggerExit2D(Collider2D collision)
+	{
+		switch (collision.tag)
+		{
+			case "Crop":
+				curCrop = null;
+				EndQTA();
+				break;
+		}
+	}
+
+	private void EndQTA()
+	{
+		curState = PlayerState.Gameplay;
+		anim.enabled = true;
+		QTAIconHolder.gameObject.SetActive(false);
+		QTAS.Clear();
+
+	}
+
+
 	private void StartQTA()
 	{
 		curState = PlayerState.QTA;
 		rb.velocity= Vector3.zero;
 		anim.SetBool("jumping", false);
 		anim.SetBool("walking", false);
+		anim.enabled = false;
 
+		arm.DOLocalRotate(new Vector3(0, 0, 90), 0.2f);
 		for (int i = 0; i < curCrop.QTAS.Count; i++)
 		{
 			//QTAS.Add(Instantiate(QTAIconPrefab, QTAIconHolder).GetComponent<QTAIcon>());
