@@ -229,4 +229,16 @@ public static class Extensions
 		_curVector.y = _newZ;
 		return _curVector;
 	}
+
+	/// <summary>
+	/// Returns a negative number if B is left of A, positive if right of A, or 0 if they are perfectly aligned
+	/// </summary>
+	/// <param name="A"></param>
+	/// <param name="B"></param>
+	/// <returns></returns>
+	public static float AngleDir(Vector2 A, Vector2 B)
+	{
+		return -A.x * B.y + A.y * B.x;
+	}
+
 }

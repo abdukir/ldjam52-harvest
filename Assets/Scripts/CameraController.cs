@@ -19,14 +19,21 @@ public class CameraController : MonoBehaviour
 		switch (player.curState)
 		{
 			case PlayerState.Hold:
+				HoldUpdate();
 				break;
 			case PlayerState.QTA:
 				QTAUpdate();
-					break;
+				break;
 			case PlayerState.Gameplay:
 				GameplayUpdate();
 				break;
 		}
+	}
+
+	private void HoldUpdate()
+	{
+		transform.position = Vector3.Lerp(transform.position, target.position.ChangeZ(-10), Time.deltaTime * moveSpeed);
+		cam.orthographicSize = Mathf.Lerp(cam.orthographicSize, 6f, Time.deltaTime * moveSpeed);
 	}
 
 	private void QTAUpdate()

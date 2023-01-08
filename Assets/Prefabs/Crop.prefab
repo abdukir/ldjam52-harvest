@@ -85,7 +85,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3692910893295137089}
   - component: {fileID: 3692910893295137090}
-  - component: {fileID: 3692910893295137091}
   m_Layer: 7
   m_Name: CropSprite
   m_TagString: Crop
@@ -160,19 +159,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!70 &3692910893295137091
-CapsuleCollider2D:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3692910893295137088}
-  m_Enabled: 0
-  m_Density: 1
-  m_Material: {fileID: 0}
-  m_IsTrigger: 0
-  m_UsedByEffector: 0
-  m_UsedByComposite: 0
-  m_Offset: {x: 0.012835085, y: 1.4291234}
-  m_Size: {x: 0.8476001, y: 3.0861979}
-  m_Direction: 0

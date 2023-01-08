@@ -58,9 +58,17 @@ public class PlayerController : MonoBehaviour
 
 	public Crop curCrop;
 
-	public float posStr, rotStr, freq, numB;
+	private float posStr = 0.05f;
+	private float rotStr = 0.1f;
+	private float freq = 80f;
+	private float numB = 5;
+
+	[SerializeField] private float fallForce;
+
+	[SerializeField] private GameObject puffPrefab;
 
 	public PlayerState curState;
+
 	void Start()
 	{
 		Application.targetFrameRate = 75;
@@ -83,7 +91,8 @@ public class PlayerController : MonoBehaviour
 			case PlayerState.Hold:
 				break;
 		}
-		
+
+
 	}
 
 	private void UpdateQTA()
@@ -178,6 +187,36 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+
+
+	private IEnumerator Fall(bool _left)
+	{
+		anim.enabled = true;
+		curState = PlayerState.Hold;
+		rb.velocity = Vector2.zero;
+		rb.sharedMaterial.bounciness = 0.5f;
+		rb.sharedMaterial.friction = 0.1f;
+		
+		GetComponent<Collider2D>().enabled = false;
+		GetComponent<Collider2D>().enabled = true;
+
+		anim.SetBool("fall", true);
+		rb.AddForce((_left ? new Vector2(-1, 2) : new Vector2(1, 2)) * Time.deltaTime * fallForce, ForceMode2D.Impulse);
+
+		yield return new WaitForSeconds(1.5f);
+
+		curState = PlayerState.Gameplay;
+		rb.sharedMaterial.bounciness = 0;
+		rb.sharedMaterial.friction = 0;
+
+		GetComponent<Collider2D>().enabled = false;
+		GetComponent<Collider2D>().enabled = true;
+
+		anim.SetBool("fall", false);
+
+		yield return null;
+	}
+
 	private bool IsGrounded()
 	{
 		bool grounded = Physics2D.OverlapCircle(groundCollisionPoint.position, collisionRadius, groundLayer);
@@ -200,15 +239,34 @@ public class PlayerController : MonoBehaviour
 	}
 	private void OnQTAKey(QTA _key)
 	{
-		CameraShaker.Presets.ShortShake2D(posStr, rotStr, freq, (int)numB);
 
 		if (_key == QTAS[0].qtaType)
 		{
+			CameraShaker.Presets.ShortShake2D(posStr, rotStr, freq, (int)numB);
 			// Correct qta
 			QTAS[0].gameObject.SetActive(false);
 			PullAnim(_key);
 			lastKey = _key;
 			QTAS.RemoveAt(0);
+		}
+		else
+		{
+			Instantiate(puffPrefab, curCrop.transform.position, Quaternion.identity).ParentSetAndDestroy(null, 0.3f);
+			// Wrong QTA
+			if (Extensions.AngleDir((Vector2)transform.position,(Vector2)curCrop.transform.position) > 0)
+			{
+				EndQTA();
+				curCrop = null;
+				StartCoroutine(Fall(false));
+				return;
+			}
+			else
+			{
+				EndQTA();
+				curCrop = null;
+				StartCoroutine(Fall(true));
+				return;
+			}
 		}
 
 		if (QTAS.Count == 0)
@@ -216,6 +274,7 @@ public class PlayerController : MonoBehaviour
 			//End event
 			EndQTA();
 			EndQtaAnim();
+			curCrop.GetComponent<BoxCollider2D>().enabled = false;
 			return;
 		}
 		Debug.Log(_key);
@@ -283,8 +342,11 @@ public class PlayerController : MonoBehaviour
 		switch (collision.tag)
 		{
 			case "Crop":
-				curCrop = collision.GetComponent<Crop>();
-				StartQTA();
+				if (curState == PlayerState.Gameplay)
+				{
+					curCrop = collision.GetComponent<Crop>();
+					StartQTA();
+				}
 				break;
 		}
 	}
@@ -294,8 +356,11 @@ public class PlayerController : MonoBehaviour
 		switch (collision.tag)
 		{
 			case "Crop":
-				curCrop = null;
-				EndQTA();
+				if (curState == PlayerState.QTA)
+				{
+					curCrop = null;
+					EndQTA();
+				}
 				break;
 		}
 	}
