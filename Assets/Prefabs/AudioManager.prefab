@@ -1,0 +1,124 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &7868769687835799599
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7868769687835799592}
+  - component: {fileID: 7868769687835799593}
+  m_Layer: 0
+  m_Name: AudioManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7868769687835799592
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7868769687835799599}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 0
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &7868769687835799593
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7868769687835799599}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 08c981d29afc6b7488f16899631197a2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  sounds:
+  - name: bgmusic
+    clip: {fileID: 8300000, guid: 6e5f6eab891a8194486cf4db3cdc63f3, type: 3}
+    volume: 0.101
+    pitch: 1
+    spatialBlend: 0
+    loop: 1
+    source: {fileID: 0}
+  - name: qta1
+    clip: {fileID: 8300000, guid: 99a25fe662974594790155930d1cc2af, type: 3}
+    volume: 0.901
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: qta2
+    clip: {fileID: 8300000, guid: 7423ffd919b0d844487bebda255feb9a, type: 3}
+    volume: 0.901
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: jump
+    clip: {fileID: 8300000, guid: 379350525ec53a84886a73d35bbc0e79, type: 3}
+    volume: 0.291
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: hurt
+    clip: {fileID: 8300000, guid: 8541fa8a857844645944890744f0453c, type: 3}
+    volume: 0.698
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: heart
+    clip: {fileID: 8300000, guid: 32d3e075fc6806e4db9ba0f2df585823, type: 3}
+    volume: 0.778
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: crow
+    clip: {fileID: 8300000, guid: 90ba542157394a6418f7dc13e37dd5c9, type: 3}
+    volume: 1
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: pickup
+    clip: {fileID: 8300000, guid: 573f65564e7788940b26ca870806a39d, type: 3}
+    volume: 1
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: wrongqta
+    clip: {fileID: 8300000, guid: 3817ed0128e8a7340a1c032062b7dfb8, type: 3}
+    volume: 1
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: crowSeedDrop
+    clip: {fileID: 8300000, guid: fd0280d110308e5438dbd1562f0718b7, type: 3}
+    volume: 0.587
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}
+  - name: seedHit
+    clip: {fileID: 8300000, guid: 2b75d6e00387d524f9df31cf6e69327d, type: 3}
+    volume: 1
+    pitch: 1
+    spatialBlend: 0
+    loop: 0
+    source: {fileID: 0}

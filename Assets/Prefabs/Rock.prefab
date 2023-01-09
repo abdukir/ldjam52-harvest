@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 9139739681282461955}
   - component: {fileID: 2311137272701500285}
   - component: {fileID: 4434589487153220877}
+  - component: {fileID: 376043556503794970}
   m_Layer: 10
   m_Name: Rock
   m_TagString: Rock
@@ -116,7 +117,7 @@ Rigidbody2D:
   m_LinearDrag: 0
   m_AngularDrag: 0.05
   m_GravityScale: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 55cd16eae025fc74c88049cc8f4bd45d, type: 2}
   m_Interpolate: 0
   m_SleepingMode: 1
   m_CollisionDetection: 0
@@ -130,10 +131,23 @@ CircleCollider2D:
   m_GameObject: {fileID: 9139739681282461954}
   m_Enabled: 1
   m_Density: 1
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 6200000, guid: 55cd16eae025fc74c88049cc8f4bd45d, type: 2}
   m_IsTrigger: 0
   m_UsedByEffector: 0
   m_UsedByComposite: 0
   m_Offset: {x: 0, y: 0}
   serializedVersion: 2
   m_Radius: 0.5
+--- !u!114 &376043556503794970
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 9139739681282461954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ad148ab5f4381144b60ba4bab254e92, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  isActive: 1

@@ -69,12 +69,17 @@ public class PlayerController : MonoBehaviour
 
 	public PlayerState curState;
 
+	private AudioManager auM;
+	private GameManager gm;
+
 	void Start()
 	{
 		Application.targetFrameRate = 75;
 		rb = GetComponent<Rigidbody2D>();
 		anim = GetComponent<Animator>();
 		curState = PlayerState.Gameplay;
+		auM = AudioManager.Instance;
+		gm = GameManager.Instance;
 	}
 
 	// Update is called once per frame
@@ -105,9 +110,8 @@ public class PlayerController : MonoBehaviour
 			OnQTAKey(QTA.rightArrow);
 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
 			OnQTAKey(QTA.upArrow);
-		rb.velocity = Vector2.zero;
-		/*if (Input.GetKeyDown(KeyCode.Space))
-			OnQTAKey(QTA.Space);*/
+		
+		
 	}
 
 	private void UpdateGameplay()
@@ -161,6 +165,7 @@ public class PlayerController : MonoBehaviour
 			jumpBufferCounter = 0f;
 			groundedEnter = true;
 			anim.SetBool("jumping", true);
+			auM.Play("jump");
 		}
 
 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
@@ -191,6 +196,11 @@ public class PlayerController : MonoBehaviour
 
 	private IEnumerator Fall(bool _left)
 	{
+		if (curState == PlayerState.QTA)
+		{
+			EndQTA();
+		}
+
 		anim.enabled = true;
 		curState = PlayerState.Hold;
 		rb.velocity = Vector2.zero;
@@ -201,13 +211,14 @@ public class PlayerController : MonoBehaviour
 		GetComponent<Collider2D>().enabled = true;
 
 		anim.SetBool("fall", true);
-		rb.AddForce((_left ? new Vector2(-1, 2) : new Vector2(1, 2)) * Time.deltaTime * fallForce, ForceMode2D.Impulse);
+		rb.velocity = (_left ? new Vector2(-1, 2) : new Vector2(1, 2)) * fallForce;
+		//rb.AddForce((_left ? new Vector2(-1, 2) : new Vector2(1, 2)) * Time.deltaTime * fallForce, ForceMode2D.Impulse);
 
 		yield return new WaitForSeconds(1.5f);
 
 		curState = PlayerState.Gameplay;
 		rb.sharedMaterial.bounciness = 0;
-		rb.sharedMaterial.friction = 0;
+		rb.sharedMaterial.friction = 0f;
 
 		GetComponent<Collider2D>().enabled = false;
 		GetComponent<Collider2D>().enabled = true;
@@ -248,23 +259,29 @@ public class PlayerController : MonoBehaviour
 			PullAnim(_key);
 			lastKey = _key;
 			QTAS.RemoveAt(0);
+			if (Random.value < 0.5f)
+				auM.Play("qta1");
+			else
+				auM.Play("qta2");
 		}
 		else
 		{
 			Instantiate(puffPrefab, curCrop.transform.position, Quaternion.identity).ParentSetAndDestroy(null, 0.3f);
 			// Wrong QTA
+			auM.Play("wrongqta");
 			if (Extensions.AngleDir((Vector2)transform.position,(Vector2)curCrop.transform.position) > 0)
 			{
 				EndQTA();
-				curCrop = null;
 				StartCoroutine(Fall(false));
+				curCrop = null;
+				
 				return;
 			}
 			else
 			{
 				EndQTA();
-				curCrop = null;
 				StartCoroutine(Fall(true));
+				curCrop = null;
 				return;
 			}
 		}
@@ -274,6 +291,7 @@ public class PlayerController : MonoBehaviour
 			//End event
 			EndQTA();
 			EndQtaAnim(curCrop.transform);
+			gm.AddScore(curCrop.score);
 			curCrop.GetComponent<BoxCollider2D>().enabled = false;
 			return;
 		}
@@ -283,6 +301,8 @@ public class PlayerController : MonoBehaviour
 	private void EndQtaAnim(Transform _crop)
 	{
 		Sequence endSeq = DOTween.Sequence();
+		_crop.SetParent(null);
+		auM.Play("pickup");
 		switch (lastKey)
 		{
 			case QTA.leftArrow:
@@ -318,8 +338,10 @@ public class PlayerController : MonoBehaviour
 				LeftRightAnim(curCrop.transform.GetChild(0), false);
 				break;
 			case QTA.upArrow:
+				curCrop.transform.GetChild(0).DOPunchPosition(Vector3.up, 0.1f, 1);
 				break;
 			case QTA.downArrow:
+				curCrop.transform.GetChild(0).DOPunchPosition(Vector3.down, 0.1f, 1);
 				break;
 			default:
 				break;
@@ -347,6 +369,32 @@ public class PlayerController : MonoBehaviour
 					curCrop = collision.GetComponent<Crop>();
 					StartQTA();
 				}
+				else if (curState == PlayerState.Hold)
+				{
+					Destroy(collision.gameObject);
+					Instantiate(puffPrefab, collision.transform.position, Quaternion.identity).ParentSetAndDestroy(null, 0.3f);
+				}
+				break;
+
+			case "Heart":
+				gm.UpdateHealth(1);
+				auM.Play("heart");
+				Instantiate(puffPrefab, collision.transform.position, Quaternion.identity).ParentSetAndDestroy(null, 0.3f);
+				Destroy(collision.gameObject);
+				break;
+
+			case "Crow":
+				if (curState == PlayerState.Hold) return;
+				if (gm.crow.curState == CrowState.Attacking)
+				{
+					StartCoroutine(Fall(false));
+					gm.UpdateHealth(-1);
+					gm.crow.curState = CrowState.Patroling;
+				}else if (gm.crow.curState == CrowState.Patroling)
+				{
+					StartCoroutine(Fall(false));
+					gm.UpdateHealth(-1);
+				}
 				break;
 		}
 	}
@@ -369,14 +417,21 @@ public class PlayerController : MonoBehaviour
 	{
 		if (collision.gameObject.CompareTag("Rock"))
 		{
-			StartCoroutine(Fall((Extensions.AngleDir(collision.contacts[0].point,transform.position) < 0)));
+			if (collision.gameObject.GetComponent<Rock>().isActive)
+			{
+				StartCoroutine(Fall((Extensions.AngleDir(collision.contacts[0].point,transform.position) < 0)));
+				gm.UpdateHealth(-1);
+				Destroy(collision.gameObject);
+			}
 		}
 	}
 
 	private void EndQTA()
 	{
 		curState = PlayerState.Gameplay;
+		gm.crow.curState = CrowState.Patroling;
 		anim.enabled = true;
+		rb.drag = 0f;
 		QTAIconHolder.gameObject.SetActive(false);
 		QTAS.Clear();
 	}
@@ -385,12 +440,19 @@ public class PlayerController : MonoBehaviour
 	private void StartQTA()
 	{
 		curState = PlayerState.QTA;
+		gm.crow.curState = CrowState.Attacking;
+
 		rb.velocity= Vector3.zero;
+		rb.drag = 10f;
 		anim.SetBool("jumping", false);
 		anim.SetBool("walking", false);
 		anim.enabled = false;
 
 		arm.DOLocalRotate(new Vector3(0, 0, 90), 0.2f);
+		for (int i = 0; i < QTAIconHolder.childCount; i++)
+		{
+			QTAIconHolder.GetChild(i).gameObject.SetActive(false);
+		}
 		for (int i = 0; i < curCrop.QTAS.Count; i++)
 		{
 			//QTAS.Add(Instantiate(QTAIconPrefab, QTAIconHolder).GetComponent<QTAIcon>());

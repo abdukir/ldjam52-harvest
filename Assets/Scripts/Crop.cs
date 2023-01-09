@@ -25,7 +25,20 @@ public class Crop : MonoBehaviour
 	[ContextMenu("testGen")]
 	private void GenerateQTAs()
 	{
-		int QTAamount = ((int)cropLevel+1) * 3;
+		int QTAamount = 0;
+		switch (cropLevel)
+		{
+			case CropLevel.Level1:
+				QTAamount = 3;
+				break;
+			case CropLevel.Level2:
+				QTAamount = 5;
+				break;
+			case CropLevel.Level3:
+				QTAamount = 7;
+				break;
+
+		}
 		for (int i = 0; i < QTAamount; i++)
 		{
 			switch (cropLevel)

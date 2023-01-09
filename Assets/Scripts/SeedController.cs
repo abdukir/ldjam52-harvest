@@ -5,7 +5,7 @@ using UnityEngine;
 public class SeedController : MonoBehaviour
 {
 	[SerializeField] private GameObject puffPrefab;
-	[SerializeField] private GameObject cropPrefab;
+	[SerializeField] private GameObject cropPrefab1, cropPrefab2, cropPrefab3;
 
 
 	private void OnCollisionEnter2D(Collision2D collision)
@@ -17,7 +17,31 @@ public class SeedController : MonoBehaviour
 
 			if (cropSpawn.childCount == 0)
 			{
-				GameObject crop = Instantiate(cropPrefab, cropSpawn.position, Quaternion.identity).ParentSetAndDestroy(cropSpawn, 0f);
+
+				AudioManager.Instance.Play("seedHit");
+				if (GameManager.Instance.score < 250)
+				{
+					//crop lvl1
+					if(Random.value < 0.95f)
+						Instantiate(cropPrefab1, cropSpawn.position, Quaternion.identity).ParentSetAndDestroy(cropSpawn, 0f);
+					else
+						Instantiate(cropPrefab2, cropSpawn.position, Quaternion.identity).ParentSetAndDestroy(cropSpawn, 0f);
+
+				}
+				else if (GameManager.Instance.score >= 250 || GameManager.Instance.score < 1000)
+				{
+					if(Random.value < 0.9f)
+						Instantiate(cropPrefab2, cropSpawn.position, Quaternion.identity).ParentSetAndDestroy(cropSpawn, 0f);
+					else
+						Instantiate(cropPrefab3, cropSpawn.position, Quaternion.identity).ParentSetAndDestroy(cropSpawn, 0f);
+				}
+				else if (GameManager.Instance.score >= 1000)
+				{
+					if (Random.value < 0.7f)
+						Instantiate(cropPrefab3, cropSpawn.position, Quaternion.identity).ParentSetAndDestroy(cropSpawn, 0f);
+					else
+						Instantiate(cropPrefab2, cropSpawn.position, Quaternion.identity).ParentSetAndDestroy(cropSpawn, 0f);
+				}
 			}
 			Destroy(gameObject);
 

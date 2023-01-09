@@ -7,6 +7,8 @@ TagManager:
   - Crop
   - Ground
   - Rock
+  - Heart
+  - Crow
   layers:
   - Default
   - TransparentFX
@@ -41,6 +43,9 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: background
+    uniqueID: 1086258917
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0

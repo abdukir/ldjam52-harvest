@@ -101,7 +101,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   puffPrefab: {fileID: 1967835574231978638, guid: 3e196c9e632c76841a71cb6e2dc6d010, type: 3}
-  cropPrefab: {fileID: 3692910892484201551, guid: 82872e5e832bd2a40864bfe32b53089f, type: 3}
+  cropPrefab1: {fileID: 3692910892484201551, guid: 82872e5e832bd2a40864bfe32b53089f, type: 3}
+  cropPrefab2: {fileID: 3692910892484201551, guid: d14d1f5c276eb544b967c301674af509, type: 3}
+  cropPrefab3: {fileID: 3692910892484201551, guid: 870b73cf09e29a942be87e41356afd59, type: 3}
 --- !u!114 &2931703113440651462
 MonoBehaviour:
   m_ObjectHideFlags: 0

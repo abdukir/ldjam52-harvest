@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.Collections.LowLevel.Unsafe;
 using UnityEngine;
 using System.Linq;
+using static UnityEngine.GraphicsBuffer;
 
 public enum CrowState
 {
@@ -19,18 +20,22 @@ public class CrowController : MonoBehaviour
 
 	[SerializeField] private int waypointAmount;
 	private List<Vector3> waypoints = new List<Vector3>();
-	[SerializeField] private CrowState curState;
+	[SerializeField] public CrowState curState;
 
 	private Rigidbody2D rb;
 	[SerializeField] private float moveSpeed;
 	private bool facingLeft;
 
-	[SerializeField] private GameObject rockPrefab, seedPrefab;
-
+	[SerializeField] private GameObject rockPrefab, seedPrefab, heartPrefab;
+	private AudioManager auM;
+	private GameManager gm;
+	private Vector2 lastPos;
 	private void Start()
 	{
-		rb= GetComponent<Rigidbody2D>();
+		rb = GetComponent<Rigidbody2D>();
 		curState = CrowState.Patroling;
+		auM = AudioManager.Instance;
+		gm = GameManager.Instance;
 		GenerateWaypoints();
 	}
 
@@ -63,7 +68,7 @@ public class CrowController : MonoBehaviour
 				UpdatePatrol();
 				break;
 			case CrowState.Attacking:
-
+				UpdateAttack();
 				break;
 			case CrowState.Fleeing:
 				break;
@@ -71,6 +76,42 @@ public class CrowController : MonoBehaviour
 
 				break;
 		}
+		if (gm.player.curCrop != null)
+		{
+			switch (gm.player.curCrop.cropLevel)
+			{
+				case Crop.CropLevel.Level1:
+					moveSpeed = 5f;
+					break;
+				case Crop.CropLevel.Level2:
+					moveSpeed = 4f;
+					break;
+				case Crop.CropLevel.Level3:
+					moveSpeed = 3f;
+					break;
+			}
+		}
+		else
+		{
+			moveSpeed = 5f;
+		}
+		
+	}
+
+	private void UpdateAttack()
+	{
+		Vector2 newPosition = Vector2.MoveTowards(transform.position, (Vector2)gm.player.transform.position, Time.deltaTime * moveSpeed);
+		rb.MovePosition(newPosition);
+
+		if (transform.position.x > gm.player.transform.position.x)
+		{
+			transform.localScale = new Vector3(-1, 1, 1);
+		}
+		if (transform.position.x < gm.player.transform.position.x)
+		{
+			transform.localScale = new Vector3(1, 1, 1);
+		}
+		Debug.Log(Extensions.AngleDir(transform.position, gm.player.transform.position));
 	}
 
 	private void UpdatePatrol()
@@ -91,39 +132,32 @@ public class CrowController : MonoBehaviour
 		{
 			Vector2 newPosition = Vector2.MoveTowards(transform.position, (Vector2)waypoints[0], Time.deltaTime * moveSpeed);
 			rb.MovePosition(newPosition);
-
-			
-
 		}
 
-		if (Extensions.AngleDir(transform.position, waypoints[0]) > 0 && facingLeft)
+		if (transform.position.x > waypoints[0].x)
 		{
-			Flip();
+			transform.localScale = new Vector3(-1, 1, 1);
 		}
-		if (Extensions.AngleDir(transform.position, waypoints[0]) < 0 && !facingLeft)
+		if (transform.position.x < waypoints[0].x)
 		{
-			Flip();
+			transform.localScale = new Vector3(1, 1, 1);
 		}
 	}
-	private void Flip()
-	{
-		Vector3 currentScale = transform.localScale;
-		currentScale.x *= -1;
-		transform.localScale = currentScale;
-
-		facingLeft = !facingLeft;
-	}
-
 
 	private void Drop()
 	{
-		if (Random.value < 0.7f)
+		if (Random.value < 0.8f)
 		{
 			//Drop
-			if (Random.value < 0.2f)
+			auM.Play("crowSeedDrop");
+			float rand = Random.value;
+			if (rand < 0.2f)
 			{
 				//Drop Rock
 				Instantiate(rockPrefab,transform.GetChild(0).position,Quaternion.identity).ParentSetAndDestroy(null,3f);
+			}else if (rand < (gm.health < 1 ? 0.1f : 0.3f))
+			{
+				Instantiate(heartPrefab, transform.GetChild(0).position, Quaternion.identity);
 			}
 			else
 			{
