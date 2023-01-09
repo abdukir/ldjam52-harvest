@@ -105,7 +105,7 @@ public class PlayerController : MonoBehaviour
 			OnQTAKey(QTA.rightArrow);
 		if (Input.GetKeyDown(KeyCode.UpArrow) || Input.GetKeyDown(KeyCode.W))
 			OnQTAKey(QTA.upArrow);
-		rb.velocity.ChangeY2D(0);
+		rb.velocity = Vector2.zero;
 		/*if (Input.GetKeyDown(KeyCode.Space))
 			OnQTAKey(QTA.Space);*/
 	}
@@ -273,36 +273,36 @@ public class PlayerController : MonoBehaviour
 		{
 			//End event
 			EndQTA();
-			EndQtaAnim();
+			EndQtaAnim(curCrop.transform);
 			curCrop.GetComponent<BoxCollider2D>().enabled = false;
 			return;
 		}
-		Debug.Log(_key);
+
 	}
 
-	private void EndQtaAnim()
+	private void EndQtaAnim(Transform _crop)
 	{
 		Sequence endSeq = DOTween.Sequence();
 		switch (lastKey)
 		{
 			case QTA.leftArrow:
-				endSeq.Append(curCrop.transform.DOJump(leftBucket.position, 9, 1, 2f));
-				endSeq.Join(curCrop.transform.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
+				endSeq.Append(_crop.DOJump(leftBucket.position, 9, 1, 2f));
+				endSeq.Join(_crop.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
 				break;
 			case QTA.rightArrow:
-				endSeq.Join(curCrop.transform.DOJump(rightBucket.position, 9, 1, 2f));
-				endSeq.Join(curCrop.transform.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
+				endSeq.Join(_crop.DOJump(rightBucket.position, 9, 1, 2f));
+				endSeq.Join(_crop.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
 				break;
 			case QTA.upArrow:
-				endSeq.Append(curCrop.transform.DOJump((Random.value > 0.5f) ? leftBucket.position : rightBucket.position, 9, 1, 2f));
-				endSeq.Join(curCrop.transform.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
+				endSeq.Append(_crop.DOJump((Random.value > 0.5f) ? leftBucket.position : rightBucket.position, 9, 1, 2f));
+				endSeq.Join(_crop.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
 				break;
 			case QTA.downArrow:
-				endSeq.Append(curCrop.transform.DOJump((Random.value > 0.5f) ? leftBucket.position : rightBucket.position, 9, 1, 2f));
-				endSeq.Join(curCrop.transform.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
+				endSeq.Append(_crop.DOJump((Random.value > 0.5f) ? leftBucket.position : rightBucket.position, 9, 1, 2f));
+				endSeq.Join(_crop.DORotate(new Vector3(0, 0, 1500), 3, RotateMode.FastBeyond360));
 				break;
 		}
-
+		endSeq.OnComplete(() => Destroy(_crop.gameObject));
 	}
 
 	private void PullAnim(QTA _key)
@@ -365,13 +365,20 @@ public class PlayerController : MonoBehaviour
 		}
 	}
 
+	private void OnCollisionEnter2D(Collision2D collision)
+	{
+		if (collision.gameObject.CompareTag("Rock"))
+		{
+			StartCoroutine(Fall((Extensions.AngleDir(collision.contacts[0].point,transform.position) < 0)));
+		}
+	}
+
 	private void EndQTA()
 	{
 		curState = PlayerState.Gameplay;
 		anim.enabled = true;
 		QTAIconHolder.gameObject.SetActive(false);
 		QTAS.Clear();
-
 	}
 
 
