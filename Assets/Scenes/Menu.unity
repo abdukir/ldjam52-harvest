@@ -3968,7 +3968,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
   m_AnchoredPosition: {x: 0, y: 99.567}
-  m_SizeDelta: {x: 509.4408, y: 178}
+  m_SizeDelta: {x: 654.7491, y: 178}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1975143462
 MonoBehaviour:
@@ -3990,10 +3990,10 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Game Title
+  m_text: Help! It's raining seeds
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 0ec74daf6a2f1b048906cfc6bd513994, type: 2}
-  m_sharedMaterial: {fileID: -3596905673729264598, guid: 0ec74daf6a2f1b048906cfc6bd513994, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 96d28e88e7d7ec44180582ea0e955254, type: 2}
+  m_sharedMaterial: {fileID: 2747755001687896813, guid: 96d28e88e7d7ec44180582ea0e955254, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -4017,8 +4017,8 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 125
-  m_fontSizeBase: 125
+  m_fontSize: 92.68
+  m_fontSizeBase: 92.68
   m_fontWeight: 400
   m_enableAutoSizing: 0
   m_fontSizeMin: 18

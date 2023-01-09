@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using CameraShake;
 using DG.Tweening;
+using UnityEngine.SceneManagement;
 
 public enum PlayerState
 {
@@ -194,7 +195,7 @@ public class PlayerController : MonoBehaviour
 
 
 
-	private IEnumerator Fall(bool _left)
+	public IEnumerator Fall(bool _left)
 	{
 		if (curState == PlayerState.QTA)
 		{
@@ -216,14 +217,25 @@ public class PlayerController : MonoBehaviour
 
 		yield return new WaitForSeconds(1.5f);
 
-		curState = PlayerState.Gameplay;
-		rb.sharedMaterial.bounciness = 0;
-		rb.sharedMaterial.friction = 0f;
+		if (gm.health == 0)
+		{
+			// Game Over
+			auM.Play("death");
+			SceneManager.LoadScene(2);
+		}
+		else
+		{
+			curState = PlayerState.Gameplay;
+			rb.sharedMaterial.bounciness = 0;
+			rb.sharedMaterial.friction = 0f;
 
-		GetComponent<Collider2D>().enabled = false;
-		GetComponent<Collider2D>().enabled = true;
+			GetComponent<Collider2D>().enabled = false;
+			GetComponent<Collider2D>().enabled = true;
 
-		anim.SetBool("fall", false);
+			anim.SetBool("fall", false);
+		}
+
+		
 
 		yield return null;
 	}
@@ -387,7 +399,7 @@ public class PlayerController : MonoBehaviour
 				if (curState == PlayerState.Hold) return;
 				if (gm.crow.curState == CrowState.Attacking)
 				{
-					StartCoroutine(Fall(false));
+					StartCoroutine(Fall(collision.transform.position.x > transform.position.x));
 					gm.UpdateHealth(-1);
 					gm.crow.curState = CrowState.Patroling;
 				}else if (gm.crow.curState == CrowState.Patroling)
@@ -441,7 +453,7 @@ public class PlayerController : MonoBehaviour
 	{
 		curState = PlayerState.QTA;
 		gm.crow.curState = CrowState.Attacking;
-
+		auM.Play("crow");
 		rb.velocity= Vector3.zero;
 		rb.drag = 10f;
 		anim.SetBool("jumping", false);

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using DG.Tweening;
+using CameraShake;
 
 public class GameManager : MonoBehaviour
 {
@@ -17,6 +18,11 @@ public class GameManager : MonoBehaviour
 	[SerializeField] public int score;
 	public int health = 3;
 
+	public List<Transform> grounds = new List<Transform>();
+
+	public float genMultiplier;
+	public float offset;
+
 	private void Awake()
 	{
 		Instance = this;
@@ -28,12 +34,6 @@ public class GameManager : MonoBehaviour
 		scoreText.text = score.ToString();
 		scoreText.GetComponent<RectTransform>().DOShakePosition(0.1f, 5, 80, 90);
 		scoreText.GetComponent<RectTransform>().DOShakeRotation(0.1f, 20, 80, 90);
-	}
-
-	private void Update()
-	{
-		if (Input.GetKeyDown(KeyCode.Space))
-			UpdateHealth(-1);
 	}
 
 	public void UpdateHealth(int _amount)
@@ -63,4 +63,14 @@ public class GameManager : MonoBehaviour
 		}
 	}
 
+	[ContextMenu("test randomize")]
+	public void RandomizeGround()
+	{
+		CameraShaker.Presets.Explosion2D(3, 3, 3);
+		StartCoroutine(player.Fall(false));
+		for (int i = 0; i < grounds.Count; i++)
+		{
+			grounds[i].localPosition = new Vector3(grounds[i].localPosition.x,(Mathf.PerlinNoise(i, grounds[i].position.y)/ genMultiplier) - offset,0f);
+		}
+	}
 }
