@@ -4,3 +4,5 @@ All the graphics and coding done by me.
 Sfx is generated from bfxr and edited in Audacity.
 Music is from Juhani Junkala
 You can use everything in the project but be cautious! It's all written in the jam so it can be messy :)
+https://ldjam.com/events/ludum-dare/52/help-its-raining-seeds/
+https://vaizaragorn.itch.io/harvest
